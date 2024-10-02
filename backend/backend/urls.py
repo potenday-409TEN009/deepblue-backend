@@ -21,5 +21,5 @@ from deepblueapp.views import google_login
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('api/google/login/', google_login, name='api_google_login'),
+    path('google/login/', google_login, name='api_google_login'),
 ]
