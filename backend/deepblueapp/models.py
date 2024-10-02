@@ -31,6 +31,7 @@ class Comment(models.Model):
         return f"Comment on {self.post.title}"
 
 class Quest(models.Model):
+    difficulty = models.SmallIntegerField()
     content = models.TextField()
     score = models.IntegerField()
     is_cleared = models.BooleanField(default=False)
