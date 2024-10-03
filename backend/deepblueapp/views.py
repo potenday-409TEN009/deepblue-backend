@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from .serializers import UserRankingSerializer
 from django.utils import timezone
 from django.db.models import Count
 from datetime import timedelta
@@ -8,6 +9,16 @@ from .permission import IsOwnerOrReadOnly
 from .models import Post,DailyCheck, Quest
 from .serializers import PostSerializer,DashBoardSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .models import UserProfile
+
+class UserRankingListView(APIView):
+    def get(self, request): 
+        users = UserProfile.objects.all().order_by('-score')[:100]
+        serializer = UserRankingSerializer(users,many=True,context={'request':request})
+        return Response(serializer.data)
+
+
+
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
@@ -32,10 +43,10 @@ class PostViewSet(viewsets.ModelViewSet):
         if post_type == 'realtime':
             queryset = queryset.order_by('-created_at')
         elif post_type == 'best':
-            # Assuming 'likes' field exists. If not, you need to implement a way to determine 'best' posts
+            
             queryset = queryset.order_by('-likes')
 
-        return queryset[:3]  # Return only 3 posts
+        return queryset[:3] 
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
