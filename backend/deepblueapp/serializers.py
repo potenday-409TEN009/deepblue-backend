@@ -2,7 +2,12 @@ from rest_framework import serializers
 from django.utils import timezone
 from .models import UserProfile,Post
 
-class DashboardSerializer(serializers.Serializer):
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+
+class DashBoardSerializer(serializers.Serializer):
     cleared_quest_count = serializers.IntegerField()
     total_cleared_day = serializers.IntegerField()
     level = serializers.IntegerField()
