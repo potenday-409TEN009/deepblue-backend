@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.db import models
 
 from django.contrib.auth.models import User
@@ -7,6 +8,20 @@ class UserProfile(models.Model):
     survey_level = models.IntegerField(default=0)
     nickname = models.CharField(max_length=12, unique=True)
     ranking = models.IntegerField()
+    score = models.IntegerField(default=0)
+
+    @property
+    def level(self):
+        if self.score< 100:
+            return 1
+        elif self.score<500:
+            return 2
+        elif self.score<2000:
+            return 3
+        elif self.score<5000:
+            return 4
+        else:
+            return 5
 
     def __str__(self):
         return self.nickname
@@ -36,6 +51,8 @@ class Quest(models.Model):
     score = models.IntegerField()
     is_cleared = models.BooleanField(default=False)
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    cleared_at = models.DateField(null=True, blank=True)
+
 
     def __str__(self):
         return f"Quest for {self.user.nickname}: {self.content[:20]}..."
