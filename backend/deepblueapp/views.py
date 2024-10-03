@@ -4,13 +4,11 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from django.utils import timezone
-from django.db.models import Count
-from django.shortcuts import render
 from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from .models import UserProfile, Post, DailyCheck, Quest, QuestList
-from .serializers import UserRankingSerializer, PostSerializer, DashBoardSerializer, QuestSerializer
+from .serializers import UserRankingSerializer, PostSerializer, QuestSerializer
 from .permission import IsOwnerOrReadOnly
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter

@@ -1,4 +1,4 @@
-from .views import UserRankingListView,UserRankingPercentView
+from .views import UserRankingListView
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from . import views

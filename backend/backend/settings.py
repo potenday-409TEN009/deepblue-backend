@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -109,13 +110,19 @@ SOCIALACCOUNT_PROVIDERS = {
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/google/login/callback/'
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',  
+        'NAME': 'deepblue_data',          
+        'USER': 'root',          
+        'PASSWORD': 'duddnjs0327',  
+        'HOST': 'localhost',                  
+        'PORT': '3306',                        
     }
 }
 
+SITE_ID = 1
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
