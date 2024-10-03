@@ -43,4 +43,19 @@ class DashboardAPIView(APIView):
             return Response(serializer.erros,status=400)
 
 
-        
+class UserInfoAPIView(APIView):
+    def post(self, request):
+        user = request.user
+        data = request.data
+        profile = user.userprofile
+
+        if 'survey_level' in data:
+            profile.survey_level = data['survey_level']
+        elif 'nickname' in data:
+            profile.nickname = data['nickname']
+        elif 'survel_level' in data and 'nickname' in data:
+            return Response({"error": "설문조사레벨 또는 이름중 하나만보내주세요"}, status=400)
+        else:
+            return Response({"error": "설문조사레벨 또는 이름을 보내주세요"}, status=400)
+        profile.save()
+        return Response({"message": "유저정보가 업데이트 되었습니다."}, status=200)
