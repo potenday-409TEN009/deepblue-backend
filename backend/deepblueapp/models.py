@@ -16,8 +16,9 @@ class Post(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    category = models.SmallIntegerField()
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    category = models.CharField(max_length=5, choices=[('a', 'A'), ('b', 'B'), ('c', 'C')])
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    likes = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
