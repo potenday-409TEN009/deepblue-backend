@@ -1,16 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import UserRankingSerializer
+from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.decorators import api_view
 from django.utils import timezone
 from django.db.models import Count
+from django.shortcuts import render
 from datetime import timedelta
-from rest_framework import viewsets
+from .models import UserProfile, Post, DailyCheck, Quest, QuestList
+from .serializers import UserRankingSerializer, PostSerializer, DashBoardSerializer, QuestSerializer
 from .permission import IsOwnerOrReadOnly
-from .models import Post,DailyCheck, Quest
-from .serializers import PostSerializer,DashBoardSerializer
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .models import UserProfile
-
 class UserRankingListView(APIView):
     def get(self, request): 
         users = UserProfile.objects.all().order_by('-score')[:100]
@@ -106,3 +105,38 @@ class UserInfoAPIView(APIView):
             return Response({"error": "설문조사레벨 또는 이름을 보내주세요"}, status=400)
         profile.save()
         return Response({"message": "유저정보가 업데이트 되었습니다."}, status=200)
+
+
+@api_view(['POST'])
+def my_quest_create(request):
+    quests_to_create =QuestList.objects.all().filter(isolation_level=request.user.isolation_level)
+    for quest in quests_to_create:
+        Quest.objects.create(user=request.user, difficulty=quest.difficulty, content=quest.content, score=quest.score)
+    return Response(status=status.HTTP_200_OK)
+
+class MyQuestListAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        quests = []
+        for difficulty in ['1', '2', '3']:
+            quest = Quest.objects.filter(user=request.user, difficulty=difficulty).first()
+            if quest:
+                quests.append(quest)
+        
+        serializer = QuestSerializer(quests, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class MyQuestDoneAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    def patch(self, request):
+        difficulty = request.data.get('difficulty')
+        user = request.user
+        quest = Quest.objects.filter(user=request.user, difficulty=difficulty).first()
+        if quest:
+            user.userprofile.score += quest.score
+            user.userprofile.save()
+            quest.is_cleared = True
+            quest.save()
+        return Response(status=status.HTTP_200_OK)
