@@ -2,6 +2,18 @@ from rest_framework import serializers
 from django.utils import timezone
 from .models import UserProfile,Post
 
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+
+class DashBoardSerializer(serializers.Serializer):
+    cleared_quest_count = serializers.IntegerField()
+    total_cleared_day = serializers.IntegerField()
+    level = serializers.IntegerField()
+    avg_week_cleared_quest = serializers.FloatField()
+    daily_check_count = serializers.IntegerField()
+
 class UserRankingSerializer(serializers.Serializer):
     nickname = serializers.CharField()
     score = serializers.IntegerField()
@@ -53,3 +65,12 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_comment_count(self, obj):
         return obj.comments.count()
+    
+class QuestSerializer(serializers.Serializer):
+    difficulty = serializers.CharField()
+    content = serializers.CharField()
+    score = serializers.IntegerField()
+    is_cleared = serializers.BooleanField()
+    created_at = serializers.DateTimeField()
+    updated_at = serializers.DateTimeField()
+
