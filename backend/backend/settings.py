@@ -9,18 +9,23 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import json
+import os
+
+# 프로젝트 경로와 같은 디렉토리에 있는 secret.json 파일 경로 설정
 
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+with open(os.path.join(BASE_DIR, 'secret.json')) as secret_file:
+    secrets = json.load(secret_file)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-t=bc!)0i*tp#^!@ima#ta848qukh)w7@2ay=q^wsklw8s&0axc'
+SECRET_KEY = secrets['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -32,6 +37,16 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'deepblueapp',
+    # 소셜로그인
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -71,17 +88,46 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
 
+# 소셜 계정 설정
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/google/login/callback/'
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',  
+        'NAME': secrets['DB_NAME'],
+        'USER': secrets['DB_USER'],
+        'PASSWORD': secrets['DB_PASSWORD'],
+        'HOST': secrets['DB_HOST'],
+        'PORT': secrets['DB_PORT'],                     
     }
 }
 
+SITE_ID = 1
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
